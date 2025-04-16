@@ -5,7 +5,7 @@ from transformers import GPT2LMHeadModel
 from models.gpt2 import GPT2
 
 class GPT2_model(GPT2):
-    def __init__(self, cfg=None, model_type="gpt2", verbose=False):
+    def __init__(self, model_type="gpt2", cfg=None, verbose=False):
         default_config = {
             'gpt2':         dict(emb_dim=768,  n_layers=12, n_heads=12), # 124M params
             'gpt2-medium':  dict(emb_dim=1024, n_layers=24, n_heads=16), # 350M params
@@ -34,11 +34,11 @@ class GPT2_model(GPT2):
         pass
     
     @classmethod
-    def from_pretrained(cls, cfg=None, model_type="gpt2", verbose=False):
-        model = cls(cfg=cfg, model_type=model_type, verbose=verbose)
+    def from_pretrained(cls, model_type="gpt2", cfg=None, verbose=False):
+        model = cls(model_type=model_type, cfg=cfg, verbose=verbose)
         current_params = model.state_dict()
 
-        hf_model = GPT2LMHeadModel.from_pretrained("gpt2").to(device)
+        hf_model = GPT2LMHeadModel.from_pretrained(model_type).to(device)
         hf_model_params = hf_model.state_dict()
 
         # OpenAI’s GPT-2 checkpoints use a Conv1d module on each linear layer.
