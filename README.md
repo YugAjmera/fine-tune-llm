@@ -10,3 +10,5 @@ model = GPT2_model("gpt2").to(device)
 # Load pretrained version
 model = GPT2_model.from_pretrained("gpt2").to(device)
 ```
+
+## Instruction Fine-tune on Alpaca dataset
