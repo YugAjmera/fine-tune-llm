@@ -1,3 +1,4 @@
+# Code to generate text from a model give the sampling hyperparameters 
 import torch
 import torch.nn as nn
 device = 'cuda' if torch.cuda.is_available() else 'cpu'

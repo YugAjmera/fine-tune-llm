@@ -1,3 +1,4 @@
+# Code to load the GPT-2 model given a configuration dictionary or model type
 import torch
 import torch.nn as nn
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
