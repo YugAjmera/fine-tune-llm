@@ -1,7 +1,6 @@
 # Code to load the GPT-2 model given a configuration dictionary or model type
 import torch
 import torch.nn as nn
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 from transformers import GPT2LMHeadModel
 from models.gpt2 import GPT2
 
@@ -9,9 +8,9 @@ class GPT2_model(GPT2):
     def __init__(self, model_type="gpt2", cfg=None, verbose=False):
         default_config = {
             'gpt2':         dict(emb_dim=768,  n_layers=12, n_heads=12), # 124M params
-            'gpt2-medium':  dict(emb_dim=1024, n_layers=24, n_heads=16), # 350M params
+            'gpt2-medium':  dict(emb_dim=1024, n_layers=24, n_heads=16), # 355M params
             'gpt2-large':   dict(emb_dim=1280, n_layers=36, n_heads=20), # 774M params
-            'gpt2-xl':      dict(emb_dim=1600, n_layers=48, n_heads=25), # 1558M params
+            'gpt2-xl':      dict(emb_dim=1600, n_layers=48, n_heads=25), # 1.5B params
         }[model_type]
         default_config.update({
             "vocab_size": 50257,    # 50,000 BPE merges + 256 byte tokens + 1 <|endoftext|> token
@@ -39,7 +38,7 @@ class GPT2_model(GPT2):
         model = cls(model_type=model_type, cfg=cfg, verbose=verbose)
         current_params = model.state_dict()
 
-        hf_model = GPT2LMHeadModel.from_pretrained(model_type).to(device)
+        hf_model = GPT2LMHeadModel.from_pretrained(model_type)
         hf_model_params = hf_model.state_dict()
 
         # OpenAI’s GPT-2 checkpoints use a Conv1d module on each linear layer.

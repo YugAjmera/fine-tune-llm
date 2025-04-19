@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 import math
 
 class MultiHeadCausalAttention(nn.Module):
@@ -112,7 +111,7 @@ class GPT2(nn.Module):
     def forward(self, x):
         B, N = x.size()
         token_emb = self.transformer.wte(x)                                             # (B, N, D)
-        pos_emb = self.transformer.wpe(torch.arange(N, device=device))                  # (N, D)
+        pos_emb = self.transformer.wpe(torch.arange(N, device=x.device))                  # (N, D)
         x = token_emb + pos_emb                                                         # (B, N, D)
         x = self.transformer.h(x)
         x = self.transformer.ln_f(x)

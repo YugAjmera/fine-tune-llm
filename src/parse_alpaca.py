@@ -1,7 +1,6 @@
 # Code to parse the Alpaca-GPT-4 dataset
 import torch
 import torch.nn as nn
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 from torch.utils.data import Dataset
 
 class AlpacaDataset(Dataset):
@@ -16,10 +15,10 @@ class AlpacaDataset(Dataset):
         # Format the data in alpaca style template & tokenize it
         full_text = self.format_alpaca_style(self.data[index])
         tokens = self.tokenizer.encode(full_text)
-        return tokens
+        return torch.tensor(tokens)
 
     @staticmethod
-    def format_alpaca_style(entry):
+    def format_alpaca_style(entry, no_reponse=False):
         if len(entry['input']) == 0:
             prompt = "Below is an instruction that describes a task. Write a response that appropriately completes the request."
             input_text = ""
@@ -27,7 +26,10 @@ class AlpacaDataset(Dataset):
             prompt = "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request."
             input_text = "\n\n### Input:\n" + entry['input']
         instruction_text = "\n\n### Instruction:\n" + entry['instruction']
-        response = "\n\n### Response:\n" + entry['output']
+        if no_reponse:
+            response = ""
+        else:
+            response = "\n\n### Response:\n" + entry['output']
         prompt += instruction_text + input_text + response
         return prompt
 
@@ -52,5 +54,5 @@ class AlpacaDataset(Dataset):
             targets.append(target_tokens[:max_length])   
 
             # TO DO: masking on the prompt if needed.
-        return torch.stack(inputs).to(device), torch.stack(targets).to(device)
+        return torch.stack(inputs), torch.stack(targets)
     
