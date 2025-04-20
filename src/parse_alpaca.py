@@ -1,6 +1,5 @@
 # Code to parse the Alpaca-GPT-4 dataset
 import torch
-import torch.nn as nn
 from torch.utils.data import Dataset
 
 class AlpacaDataset(Dataset):
