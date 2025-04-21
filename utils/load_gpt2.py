@@ -1,9 +1,11 @@
-# Code to load the GPT-2 model given a configuration dictionary or model type
 import torch
 from transformers import GPT2LMHeadModel
 from models.gpt2 import GPT2
 
 class GPT2_model(GPT2):
+    """
+    Custom class to load the GPT2 model of user-defined model type/configuration dictionary.
+    """
     def __init__(self, model_type="gpt2", cfg=None, verbose=False):
         default_config = {
             'gpt2':         dict(emb_dim=768,  n_layers=12, n_heads=12), # 124M params

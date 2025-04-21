@@ -1,9 +1,11 @@
-# Code to parse the Alpaca-GPT-4 dataset
 import torch
 from torch.utils.data import Dataset
 
 
-def format_alpaca_style(entry, no_reponse=False):
+def format_alpaca_style(entry):
+    """
+    Formats a dictionary entry into the Alpaca-style prompt structure. 
+    """
     if len(entry['input']) == 0:
         prompt = "Below is an instruction that describes a task. Write a response that appropriately completes the request."
         input_text = ""
@@ -11,15 +13,15 @@ def format_alpaca_style(entry, no_reponse=False):
         prompt = "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request."
         input_text = "\n\n### Input:\n" + entry['input']
     instruction_text = "\n\n### Instruction:\n" + entry['instruction']
-    if no_reponse:
-        response = ""
-    else:
-        response = "\n\n### Response:\n" + entry['output']
+    response = "\n\n### Response:\n" + entry['output']
     prompt += instruction_text + input_text + response
     return prompt
 
 
 class AlpacaDataset(Dataset):
+    """
+    A custom Dataset class to obtain tokens from the Alpaca dataset
+    """
     def __init__(self, data, tokenizer):
         self.data = data
         self.tokenizer = tokenizer
@@ -35,9 +37,11 @@ class AlpacaDataset(Dataset):
     
     
 def collated_func(batch, pad_token_id=50256, ignore_index=-100, max_length=1024):
-    # A custom collate function that pads each sequence to make them of same length.
-    # This approach extends sequences to match the longest one in each batch, not the whole dataset. Hence, efficient!
-
+    """
+    A custom collate function that pads each sequence to make them of same length.
+    This approach extends sequences to match the longest one in each batch, not the whole dataset. Hence, efficient!
+    """
+    
     batch_max_len = max(len(item) for item in batch)         
     inputs, targets = [], []
     for item in batch:
