@@ -33,8 +33,8 @@ class GPT2_model(GPT2):
         pass
     
     @classmethod
-    def from_pretrained(cls, model_type="gpt2", cfg=None, verbose=False):
-        model = cls(model_type=model_type, cfg=cfg, verbose=verbose)
+    def from_pretrained(cls, model_type="gpt2", verbose=False):
+        model = cls(model_type=model_type, cfg=None, verbose=verbose)
         current_params = model.state_dict()
 
         hf_model = GPT2LMHeadModel.from_pretrained(model_type)

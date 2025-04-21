@@ -4,6 +4,6 @@ __pycache__/
 .DS_Store
 *.bin
 *.pkl
-*.pt
+*.pth
 *.pyc
 *.json
