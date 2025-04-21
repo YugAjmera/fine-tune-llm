@@ -10,7 +10,7 @@ from utils.alpaca_dataset import AlpacaDataset, format_alpaca_style, collated_fu
 from utils.sample import Generator
 from utils.train import CosineWithWarmupScheduler, train
 
-data_pth = "/home/ma/yajmera/llm-from-scratch/chatgpt_9k.json"
+data_pth = "/home/ma/yajmera/llm-from-scratch/datasets/chatgpt_9k.json"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {device}")
 
@@ -25,6 +25,7 @@ eval_freq = 10
 save_steps = 200
 
 # Load pre-trained GPT2 medium (355M) and its tokenizer
+print("Loading model...")
 model = GPT2_model.from_pretrained("gpt2-medium").to(device)
 tokenizer = tiktoken.get_encoding("gpt2")
 
