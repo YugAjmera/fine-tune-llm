@@ -8,6 +8,14 @@ checkpoint_pth = "/home/ma/yajmera/llm-from-scratch/saved_checkpoints/693.pth"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {device}")
 
+# Generation hyperparameters
+max_new_tokens = 30
+do_sample = True
+temperature = 0.7
+top_k = 0
+top_p = 0.9
+eos_id = 50256
+
 # Initialize GPT2 medium (355M) and its tokenizer
 print("Loading model...")
 model = GPT2_model("gpt2-medium").to(device)
@@ -33,11 +41,11 @@ while True:
         generator = Generator(model=model, 
                       tokenizer=tokenizer, 
                       device=device, 
-                      max_new_tokens=100, 
-                      do_sample=True,
-                      temperature=0.7,
-                      top_p=0.9,
-                      top_k=0,
-                      eos_id=50256)
+                      max_new_tokens=max_new_tokens, 
+                      do_sample=do_sample,
+                      temperature=temperature,
+                      top_k=top_k,
+                      top_p=top_p,
+                      eos_id=eos_id)
         model_response = generator.generate_response(prompt=prompt) 
         print(f"Model: {model_response}\n")    
