@@ -44,6 +44,7 @@ Default features:
 - Mixed precision with `bfloat16` for general operations and `TF32` for matrix multiplication.
 - A learning rate scheduler with linear warmup followed by cosine annealing.
 - Gradient accumalation.
+- Low-Rank Adaptation (LoRA)
 ```
 # Fine-tuning Hyperparameters
 batch_size = 4

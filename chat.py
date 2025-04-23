@@ -4,26 +4,32 @@ from utils.load_gpt2 import GPT2_model
 from utils.alpaca_dataset import format_alpaca_style
 from utils.sample import Generator
 
-checkpoint_pth = "/home/ma/yajmera/llm-from-scratch/saved_checkpoints/693.pth"
+checkpoint_pth = "/home/ma/yajmera/llm-from-scratch/saved_checkpoints/lora_600.pth"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {device}")
 
 # Generation hyperparameters
-max_new_tokens = 30
+max_new_tokens = 500
 do_sample = True
-temperature = 0.7
-top_k = 0
+temperature = 0.9
+top_k = 40
 top_p = 0.9
 eos_id = 50256
+use_lora = True
+lora_r = 16
+lora_alpha = 16
 
 # Initialize GPT2 medium (355M) and its tokenizer
 print("Loading model...")
-model = GPT2_model("gpt2-medium").to(device)
 tokenizer = tiktoken.get_encoding("gpt2")
+if use_lora:
+    model = GPT2_model.from_pretrained("gpt2-medium", use_lora=use_lora, lora_rank=lora_r, lora_alpha=lora_alpha).to(device)
+else:
+    model = GPT2_model("gpt2-medium").to(device)
 
 # Load the checkpoints weights in the model
 checkpoint = torch.load(checkpoint_pth, map_location='cpu')
-model.load_state_dict(checkpoint["model_state_dict"])
+model.load_state_dict(checkpoint["model_state_dict"], strict=False)
 
 print("🧠 Model is ready. Type your message and hit Enter. Type 'quit' to exit.\n")
 

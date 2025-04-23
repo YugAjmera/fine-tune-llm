@@ -21,7 +21,7 @@ class CosineWithWarmupScheduler(_LRScheduler):
             return [max(0.0, self.base_lr * 0.5 * (1.0 + math.cos(math.pi * progress)))]
     
 
-def train(model, device, train_loader, val_loader, optimizers: tuple, criterion, num_train_epochs, eval_freq, save_steps, grad_accum_steps=1, prompt=None, generator: Generator = None):
+def train(model, device, train_loader, val_loader, optimizers: tuple, criterion, num_train_epochs, eval_freq, save_steps, grad_accum_steps=1, prompt=None, generator: Generator = None, save_path="saved_checkpoints/gpt2", use_lora=False):
     """
     Trains the model with mixed precision, gradient accumulation and learning rate scheduling.
     """
@@ -73,14 +73,16 @@ def train(model, device, train_loader, val_loader, optimizers: tuple, criterion,
 
                 # Save checkpoint
                 if global_step % save_steps == 0 or (step == len(train_loader) - 1 and epoch == num_train_epochs - 1):
-                    print(f"Saving checkpoint at step {global_step}")
+                    print(f"Saving checkpoint at step {global_step}")  
+                    if use_lora:
+                        state_dict = {name: param for name, param in model.state_dict().items() if "lora_A" in name or "lora_B" in name}
+                    else:
+                        state_dict = model.state_dict()
                     torch.save({
-                        "model_state_dict": model.state_dict(),
-                        "optimizer_state_dict": optimizer.state_dict(),
-                        "scheduler_state_dict": scheduler.state_dict() if scheduler else None,
+                        "model_state_dict": state_dict,
                         "epoch": epoch,
                         "global_step": global_step,
-                    }, "saved_checkpoints/"+f"{global_step}.pth")
+                    }, f"{save_path}_{global_step}.pth")
 
                     # Generate text
                     if generator is not None:

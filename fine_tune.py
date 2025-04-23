@@ -10,7 +10,7 @@ from utils.alpaca_dataset import AlpacaDataset, format_alpaca_style, collated_fu
 from utils.sample import Generator
 from utils.train import CosineWithWarmupScheduler, train
 
-data_pth = "/home/ma/yajmera/llm-from-scratch/datasets/chatgpt_9k.json"
+data_path = "/home/ma/yajmera/llm-from-scratch/datasets/chatgpt_9k.json"
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {device}")
 
@@ -18,20 +18,23 @@ print(f"Using device: {device}")
 batch_size = 4
 grad_accum_steps = 8
 num_epochs = 3
-lr = 2e-5
+lr = 5e-4
 weight_decay = 0
-warmup_ratio = 0.03
+warmup_ratio = 0.1
 eval_freq = 10
 save_steps = 200
+use_lora = True
+lora_r = 16
+lora_alpha = 16
 
 # Load pre-trained GPT2 medium (355M) and its tokenizer
 print("Loading model...")
-model = GPT2_model.from_pretrained("gpt2-medium").to(device)
+model = GPT2_model.from_pretrained("gpt2-medium", use_lora=use_lora, lora_rank=lora_r, lora_alpha=lora_alpha).to(device)
 tokenizer = tiktoken.get_encoding("gpt2")
 
 # Dataset Preprocessing & Batching
 print("Loading data...")
-with open(data_pth, "r") as f:
+with open(data_path, "r") as f:
     data = json.load(f)
 n_train = int(0.8 * len(data))
 train_set = AlpacaDataset(data[:n_train], tokenizer)
@@ -63,7 +66,7 @@ print(f"Model: {model_response}")
 # Fine-tune the model
 start_time = time.time()
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.AdamW(model.parameters(), lr=5e-3, weight_decay=weight_decay)
+optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 scheduler = CosineWithWarmupScheduler(optimizer=optimizer, max_lr=lr, warmup_ratio=warmup_ratio, total_steps=total_train_steps)
 
 train_losses, val_losses = train(model=model,
@@ -77,7 +80,9 @@ train_losses, val_losses = train(model=model,
                                  save_steps=save_steps,
                                  grad_accum_steps=grad_accum_steps,
                                  prompt=prompt,
-                                 generator=generator)
+                                 generator=generator,
+                                 save_path="saved_checkpoints/lora",
+                                 use_lora=True)
 
 end_time = time.time()
 execution_time_minutes = (end_time - start_time) / 60

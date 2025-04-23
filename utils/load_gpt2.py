@@ -1,6 +1,9 @@
 import torch
+import torch.nn as nn
+from functools import partial
 from transformers import GPT2LMHeadModel
 from models.gpt2 import GPT2
+from models.lora import LinearWithLoRA
 
 class GPT2_model(GPT2):
     """
@@ -35,8 +38,8 @@ class GPT2_model(GPT2):
         pass
     
     @classmethod
-    def from_pretrained(cls, model_type="gpt2", verbose=False):
-        model = cls(model_type=model_type, cfg=None, verbose=verbose)
+    def from_pretrained(cls, model_type="gpt2", use_lora=False, lora_rank=16, lora_alpha=16):
+        model = cls(model_type=model_type, cfg=None)
         current_params = model.state_dict()
 
         hf_model = GPT2LMHeadModel.from_pretrained(model_type)
@@ -55,13 +58,20 @@ class GPT2_model(GPT2):
                     else:
                         raise ValueError(f"Shape mismatch for parameter '{name}': {param.shape} (HF) vs {current_params[name].shape} (Model)")
                 else:
-                    raise KeyError(f"Parameter '{name}' not found in your model")
-        if verbose:    
-            print("Loaded weights from OpenAI checkpoint successfully!")
+                    raise KeyError(f"Parameter '{name}' not found in your model")   
+        print("Loaded weights from OpenAI checkpoint successfully!")
+        
+        if use_lora:
+            # Freeze the weights of the model
+            for param in model.parameters():
+                param.requires_grad = False
+            
+            # Add LoRA layers
+            assign_lora = partial(LinearWithLoRA, rank=lora_rank, alpha=lora_alpha)
+            for layer in model.transformer.h:
+                layer.attn.c_attn = assign_lora(layer.attn.c_attn)
+                layer.attn.c_proj = assign_lora(layer.attn.c_proj)
+        
+            print(f"LoRA added. Total trainable params: {(sum(p.numel() for p in model.parameters() if p.requires_grad) / 1e6):.2f} M parameters.")
+        
         return model
-
-
-
-
-
-
