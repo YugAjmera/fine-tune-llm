@@ -60,10 +60,13 @@ save_steps = 200
 ### Inference (`chat.py`)
 ```
 # Generation hyperparameters
-max_new_tokens = 30
+max_new_tokens = 500
 do_sample = True
-temperature = 0.7
-top_k = 0
+temperature = 0.9
+top_k = 40
 top_p = 0.9
 eos_id = 50256
+use_lora = True
+lora_r = 16
+lora_alpha = 16
 ```
