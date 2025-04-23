@@ -50,11 +50,14 @@ Default features:
 batch_size = 4
 grad_accum_steps = 8
 num_epochs = 3
-lr = 2e-5
+lr = 5e-4
 weight_decay = 0
-warmup_ratio = 0.03
+warmup_ratio = 0.1
 eval_freq = 10
 save_steps = 200
+use_lora = True
+lora_r = 16
+lora_alpha = 16
 ```
 
 ### Inference (`chat.py`)
